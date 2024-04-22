@@ -4,7 +4,7 @@ use alloy_json_abi::Function;
 use alloy_network::{Ethereum, Network, ReceiptResponse, TransactionBuilder};
 use alloy_primitives::{Address, Bytes, TxKind, U256};
 use alloy_provider::{PendingTransactionBuilder, Provider};
-use alloy_rpc_types::{state::StateOverride, BlockId};
+use alloy_rpc_types::{state::StateOverride, BlobTransactionSidecar, BlockId};
 use alloy_sol_types::SolCall;
 use alloy_transport::Transport;
 use std::{
@@ -298,6 +298,12 @@ impl<T: Transport + Clone, P: Provider<T, N>, D: CallDecoder, N: Network> CallBu
         } else {
             Address::ZERO
         }
+    }
+    
+    /// Sets the `sidecar` field in the transaction to the provided value.
+    pub fn sidecar(mut self, blob_sidecar: BlobTransactionSidecar) -> Self {
+        self.request.set_blob_sidecar(blob_sidecar);
+        self
     }
 
     /// Uses a Legacy transaction instead of an EIP-1559 one to execute the call
