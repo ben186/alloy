@@ -18,6 +18,9 @@
 #[cfg(any(test, feature = "multicall"))]
 extern crate self as alloy_contract;
 
+mod eth_call;
+pub use eth_call::{CallDecoder, EthCall};
+
 mod error;
 pub use error::*;
 
