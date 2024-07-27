@@ -164,7 +164,7 @@ where
 /// It is an implementation detail of [`CallBuilder`].
 ///
 /// [`CallBuilder`]: crate::CallBuilder
-pub trait CallDecoder: private::Sealed {
+pub trait CallDecoder: private::Sealed + Clone {
     // Not public API.
 
     /// The output type of the contract function.

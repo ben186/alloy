@@ -24,74 +24,6 @@ pub type DynCallBuilder<T, P, N = Ethereum> = CallBuilder<T, P, Function, N>;
 /// [`CallBuilder`] that does not have a call decoder.
 pub type RawCallBuilder<T, P, N = Ethereum> = CallBuilder<T, P, (), N>;
 
-mod private {
-    pub trait Sealed {}
-    impl Sealed for super::Function {}
-    impl<C: super::SolCall> Sealed for super::PhantomData<C> {}
-    impl Sealed for () {}
-}
-
-/// A trait for decoding the output of a contract function.
-///
-/// This trait is sealed and cannot be implemented manually.
-/// It is an implementation detail of [`CallBuilder`].
-pub trait CallDecoder: private::Sealed + Clone {
-    // Not public API.
-
-    /// The output type of the contract function.
-    #[doc(hidden)]
-    type CallOutput;
-
-    /// Decodes the output of a contract function.
-    #[doc(hidden)]
-    fn abi_decode_output(&self, data: Bytes, validate: bool) -> Result<Self::CallOutput>;
-
-    #[doc(hidden)]
-    fn as_debug_field(&self) -> impl std::fmt::Debug;
-}
-
-impl CallDecoder for Function {
-    type CallOutput = Vec<DynSolValue>;
-
-    #[inline]
-    fn abi_decode_output(&self, data: Bytes, validate: bool) -> Result<Self::CallOutput> {
-        FunctionExt::abi_decode_output(self, &data, validate).map_err(Error::AbiError)
-    }
-
-    #[inline]
-    fn as_debug_field(&self) -> impl std::fmt::Debug {
-        self
-    }
-}
-
-impl<C: SolCall> CallDecoder for PhantomData<C> {
-    type CallOutput = C::Return;
-
-    #[inline]
-    fn abi_decode_output(&self, data: Bytes, validate: bool) -> Result<Self::CallOutput> {
-        C::abi_decode_returns(&data, validate).map_err(|e| Error::AbiError(e.into()))
-    }
-
-    #[inline]
-    fn as_debug_field(&self) -> impl std::fmt::Debug {
-        std::any::type_name::<C>()
-    }
-}
-
-impl CallDecoder for () {
-    type CallOutput = Bytes;
-
-    #[inline]
-    fn abi_decode_output(&self, data: Bytes, _validate: bool) -> Result<Self::CallOutput> {
-        Ok(data)
-    }
-
-    #[inline]
-    fn as_debug_field(&self) -> impl std::fmt::Debug {
-        format_args!("()")
-    }
-}
-
 /// A builder for sending a transaction via `eth_sendTransaction`, or calling a contract via
 /// `eth_call`.
 ///
@@ -406,6 +338,8 @@ impl<T: Transport + Clone, P: Provider<T, N>, D: CallDecoder, N: Network> CallBu
         let to = self.request.to();
 
         if let Some(to) = to {
+            let to = TxKind::from(to);
+
             match to {
                 TxKind::Call(address) => address,
                 TxKind::Create => Address::ZERO,

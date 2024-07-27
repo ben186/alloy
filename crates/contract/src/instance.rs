@@ -87,7 +87,7 @@ impl<T: Transport + Clone, P: Provider<T, N> + Clone, N: Network> ContractInstan
         args: &[DynSolValue],
     ) -> Result<CallBuilder<T, P, Function, N>> {
         let function = self.interface.get_from_name(name)?;
-        CallBuilder::new_dyn(self.provider.clone(), function, args, &self.address)
+        CallBuilder::new_dyn(self.provider.clone(), &self.address, function, args)
     }
 }
 
