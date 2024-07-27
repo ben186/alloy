@@ -6,7 +6,6 @@
 #![cfg_attr(not(test), warn(unused_crate_dependencies))]
 #![cfg_attr(docsrs, feature(doc_cfg, doc_auto_cfg))]
 
-#[cfg(any(test, feature = "multicall"))]
 extern crate self as alloy_contract;
 
 mod eth_call;
@@ -39,7 +38,5 @@ pub mod private {
     pub use alloy_transport::Transport;
 }
 
-#[cfg(feature = "multicall")]
 mod multicall;
-#[cfg(feature = "multicall")]
 pub use multicall::*;

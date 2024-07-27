@@ -28,7 +28,7 @@ alloy-transport.workspace = true
 alloy-dyn-abi = { workspace = true, features = ["std"] }
 alloy-json-abi.workspace = true
 alloy-primitives.workspace = true
-alloy-sol-types.workspace = true
+alloy-sol-types = { workspace = true, features = ["json"] }
 
 futures-util.workspace = true
 futures.workspace = true
@@ -51,4 +51,3 @@ serde_json.workspace = true
 
 [features]
 pubsub = ["alloy-provider/pubsub", "dep:alloy-pubsub"]
-multicall = ["alloy-sol-types/json"]
